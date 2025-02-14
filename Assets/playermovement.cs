@@ -1,18 +1,17 @@
 using UnityEngine;
 
-public class playermovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     public CharacterController controller;
-
-    public float Speed = 12f;
+    public float speed = 12f;
+    public float sprintSpeed = 24f; // Add a sprint speed
     public float gravity = -9.81f;
-
-public float jumpHeight = 3f;
+    public float jumpHeight = 3f;
 
     public Transform groundCheck;
     public float groundDistance = 0.4f; 
     public LayerMask groundMask;
-    Vector3 velosity;
+    Vector3 velocity;
     bool isGrounded;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -26,26 +25,32 @@ public float jumpHeight = 3f;
     {
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
-        if (isGrounded && velosity.y < 0)
+        if (isGrounded && velocity.y < 0)
         {
-            velosity.y = -2f;
+            velocity.y = -2f;
         }
 
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
-        
+
+        // Determine if the sprint button is being held down
+        bool isSprinting = Input.GetKey(KeyCode.LeftShift);
+
+        // Use sprint speed if sprinting, otherwise use normal speed
+        float currentSpeed = isSprinting ? sprintSpeed : speed;
+
         Vector3 move = transform.right * x + transform.forward * z;
 
-        controller.Move(move * Speed * Time.deltaTime);
+        controller.Move(move * currentSpeed * Time.deltaTime);
 
-        if(Input.GetButtonDown("Jump") && isGrounded)
+        if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            velosity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
 
-        velosity.y += gravity * Time.deltaTime;
+        velocity.y += gravity * Time.deltaTime;
 
-        controller.Move(velosity * Time.deltaTime);
-
+        controller.Move(velocity * Time.deltaTime);
+    
     }
 }
